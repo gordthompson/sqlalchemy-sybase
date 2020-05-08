@@ -56,7 +56,6 @@ from sqlalchemy.types import Unicode
 from sqlalchemy.types import VARBINARY
 from sqlalchemy.types import VARCHAR
 
-
 RESERVED_WORDS = set(
     [
         "add",
@@ -652,12 +651,7 @@ class SybaseDialect(default.DefaultDialect):
     construct_arguments = []
 
     def __init__(self, *args, **kwargs):
-        util.warn_deprecated(
-            "The Sybase dialect is deprecated and will be removed "
-            "in a future version.",
-            version="1.4",
-        )
-        super(SybaseDialect, self).__init__(*args, **kwargs)
+       super(SybaseDialect, self).__init__(*args, **kwargs)
 
     def _get_default_schema_name(self, connection):
         return connection.scalar(

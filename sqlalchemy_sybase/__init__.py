@@ -5,6 +5,7 @@
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
+from sqlalchemy.dialects import registry as _registry
 from . import base  # noqa
 from . import pyodbc  # noqa
 from . import pysybase  # noqa
@@ -33,10 +34,14 @@ from .base import UNIVARCHAR
 from .base import VARBINARY
 from .base import VARCHAR
 
+__version__ = "0.0.0a1"
 
-# default dialect
+# default (and only) dialect
 base.dialect = dialect = pyodbc.dialect
 
+_registry.register(
+    "sybase.pyodbc", "sqlalchemy_sybase.pyodbc", "SybaseDialect_pyodbc"
+)
 
 __all__ = (
     "CHAR",
