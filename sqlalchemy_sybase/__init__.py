@@ -8,7 +8,6 @@
 from sqlalchemy.dialects import registry as _registry
 from . import base  # noqa
 from . import pyodbc  # noqa
-from . import pysybase  # noqa
 from .base import BIGINT
 from .base import BINARY
 from .base import BIT
