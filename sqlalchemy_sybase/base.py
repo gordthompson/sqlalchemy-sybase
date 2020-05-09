@@ -36,6 +36,8 @@ from sqlalchemy.engine import reflection
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql import text
 from sqlalchemy.types import BIGINT
+from sqlalchemy.types import Boolean
+from sqlalchemy.types import BOOLEAN
 from sqlalchemy.types import BINARY
 from sqlalchemy.types import CHAR
 from sqlalchemy.types import DATE
@@ -516,12 +518,9 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
     def get_select_precolumns(self, select, **kw):
         s = select._distinct and "DISTINCT " or ""
 
-        if select._simple_int_limit and not select._offset:
+        if select._limit_clause is not None and select._offset_clause is None:
             kw["literal_execute"] = True
             s += "TOP %s " % self.process(select._limit_clause, **kw)
-
-        if select._offset:
-            raise NotImplementedError("Sybase ASE does not support OFFSET")
         return s
 
     def get_from_hint_text(self, table, text):
@@ -529,7 +528,20 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
 
     def limit_clause(self, select, **kw):
         # Limit in sybase is after the select keyword
-        return ""
+        limit_offset_text = ""
+        if (
+            select._limit_clause is not None
+            and select._offset_clause is not None
+        ):
+            limit_offset_text = " ROWS OFFSET %s LIMIT %s " % (
+                self.process(select._offset_clause, **kw),
+                self.process(select._limit_clause, **kw),
+            )
+        elif select._offset_clause is not None:
+            raise NotImplementedError(
+                "Sybase ASE does not support OFFSET without LIMIT"
+            )
+        return limit_offset_text
 
     def visit_extract(self, extract, **kw):
         field = self.extract_map.get(extract.field, extract.field)
@@ -570,6 +582,9 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
             t._compiler_dispatch(self, asfrom=True, fromhints=from_hints, **kw)
             for t in [from_table] + extra_froms
         )
+
+    def visit_empty_set_expr(self, type_):
+        return "SELECT 1 WHERE 1!=1"
 
 
 class SybaseDDLCompiler(compiler.DDLCompiler):
@@ -613,7 +628,8 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
                 if not column.nullable or column.primary_key:
                     colspec += " NOT NULL"
                 else:
-                    colspec += " NULL"
+                    if not isinstance(column.type, (Boolean, BOOLEAN)):
+                        colspec += " NULL"
 
         return colspec
 
@@ -651,7 +667,7 @@ class SybaseDialect(default.DefaultDialect):
     construct_arguments = []
 
     def __init__(self, *args, **kwargs):
-       super(SybaseDialect, self).__init__(*args, **kwargs)
+        super(SybaseDialect, self).__init__(*args, **kwargs)
 
     def _get_default_schema_name(self, connection):
         return connection.scalar(

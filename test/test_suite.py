@@ -1,199 +1,206 @@
 import pytest
 
+from sqlalchemy import extract
+from sqlalchemy.testing import assert_raises_message
 from sqlalchemy.testing.suite import *
+from sqlalchemy.testing.suite import (
+    ComponentReflectionTest as _ComponentReflectionTest,
+)
+from sqlalchemy.testing.suite import CompoundSelectTest as _CompoundSelectTest
+from sqlalchemy.testing.suite import DateTest as _DateTest
+from sqlalchemy.testing.suite import (
+    DateTimeCoercedToDateTimeTest as _DateTimeCoercedToDateTimeTest,
+)
+from sqlalchemy.testing.suite import (
+    DateTimeMicrosecondsTest as _DateTimeMicrosecondsTest,
+)
+from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
+from sqlalchemy.testing.suite import (
+    DeprecatedCompoundSelectTest as _DeprecatedCompoundSelectTest,
+)
+from sqlalchemy.testing.suite import DistinctOnTest as _DistinctOnTest
+from sqlalchemy.testing.suite import (
+    ExpandingBoundInTest as _ExpandingBoundInTest,
+)
+from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
+from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
+from sqlalchemy.testing.suite import StringTest as _StringTest
 
-# from sqlalchemy.testing.suite import (
-#     ComponentReflectionTest as _ComponentReflectionTest,
-# )
-# from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
-# from sqlalchemy.testing.suite import (
-#     ExpandingBoundInTest as _ExpandingBoundInTest,
-# )
-# from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
-# from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
-# from sqlalchemy.testing.suite import JoinTest as _JoinTest
-# from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
-# from sqlalchemy.testing.suite import NumericTest as _NumericTest
-# from sqlalchemy.testing.suite import OrderByLabelTest as _OrderByLabelTest
-# from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
-#
-#
-# class ComponentReflectionTest(_ComponentReflectionTest):
-#     @pytest.mark.skip()
-#     def test_get_noncol_index_no_pk(cls):
-#         # This test actually passes, but if we bypass it then we don't get
-#         # a teardown error after the last test in this class. The related "pk"
-#         # test (immediately below) does need to be bypassed, but if we only
-#         # bypass that one then the teardown error occurs, so skip them both.
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_get_noncol_index_pk(cls):
-#         # This test fails because Access automatically creates a unique
-#         # *index* (not constraint) on the primary key. The test is expecting
-#         # to see just one index (on a non-PK column) but it is seeing two.
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_get_unique_constraints(cls):
-#         # Access barfs on DDL trying to create a constraint named "i.have.dots"
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_nullable_reflection(cls):
-#         # Access ODBC implementation of the SQLColumns function reports that
-#         # a column is nullable even when it is not
-#         return
-#
-#
-# class DateTimeTest(_DateTimeTest):
-#     @pytest.mark.skip()
-#     def test_null_bound_comparison(cls):
-#         # bypass this test because Access ODBC fails with
-#         # "Unrecognized keyword WHEN."
-#         return
-#
-#
-# class ExpandingBoundInTest(_ExpandingBoundInTest):
-#     @pytest.mark.skip()
-#     def test_null_in_empty_set_is_false(cls):
-#         """ Access SQL can't do CASE ... WHEN, but this test would pass if we
-#             re-wrote the query to be
-#
-#                 SELECT (n = 1) AS result
-#                 FROM
-#                     (
-#                         SELECT COUNT(*) AS n FROM USysSQLAlchemyDUAL
-#                         WHERE NULL IN (SELECT NULL FROM USysSQLAlchemyDUAL WHERE 1=0)
-#                     )
-#         """
-#         return
-#
-#
-# class InsertBehaviorTest(_InsertBehaviorTest):
-#     @pytest.mark.skip()
-#     def test_empty_insert(cls):
-#         # bypass this test because Access ODBC fails with
-#         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
-#         return
-#
-#
-# class IntegerTest(_IntegerTest):
-#     @pytest.mark.skip()
-#     def test_huge_int(cls):
-#         # bypass this test because Access ODBC fails with
-#         # [ODBC Microsoft Access Driver] Optional feature not implemented.
-#         return
-#
-#
-# class JoinTest(_JoinTest):
-#     @pytest.mark.skip()
-#     def test_inner_join_true(cls):
-#         # bypass this test because Access ODBC fails with
-#         # "JOIN expression not supported."
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_inner_join_false(cls):
-#         # bypass this test because Access ODBC fails with
-#         # "JOIN expression not supported."
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_outer_join_false(cls):
-#         # bypass this test because Access ODBC fails with
-#         # "JOIN expression not supported."
-#         return
-#
-#
-# class LikeFunctionsTest(_LikeFunctionsTest):
-#     """ Access SQL doesn't do ESCAPE
-#     """
-#
-#     @pytest.mark.skip()
-#     def test_contains_autoescape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_contains_autoescape_escape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_contains_escape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_endswith_autoescape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_endswith_autoescape_escape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_endswith_escape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_startswith_autoescape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_startswith_autoescape_escape(cls):
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_startswith_escape(cls):
-#         return
-#
-#
-# class NumericTest(_NumericTest):
-#     @pytest.mark.skip()
-#     def test_decimal_coerce_round_trip(cls):
-#         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
-#         # decimal.Decimal parameter value
-#         # https://github.com/mkleehammer/pyodbc/issues/624
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_decimal_coerce_round_trip_w_cast(cls):
-#         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
-#         # decimal.Decimal parameter value
-#         # https://github.com/mkleehammer/pyodbc/issues/624
-#         return
-#
-#
-# class OperatorOverrideTest(fixtures.TablesTest):
-#     @testing.provide_metadata
-#     def test_not_equals_operator(self, connection):
-#         # test for issue #6
-#         tbl = Table(
-#             "ne_test", self.metadata, Column("id", Integer, primary_key=True),
-#         )
-#         tbl.create(connection)
-#         connection.execute(
-#             tbl.insert(), [{"id": 1}],
-#         )
-#         result = connection.execute(tbl.select(tbl.c.id != 1)).fetchall()
-#         eq_(len(result), 0)
-#         result = connection.execute(tbl.select(tbl.c.id != 2)).fetchall()
-#         eq_(len(result), 1)
-#
-#
-# class OrderByLabelTest(_OrderByLabelTest):
-#     @pytest.mark.skip()
-#     def test_composed_multiple(cls):
-#         # SELECT statement too complex for Access SQL
-#         # "Reserved error (-1001); there is no message for this error."
-#         return
-#
-#
-# class TableDDLTest(_TableDDLTest):
-#     @pytest.mark.skip()
-#     def test_create_table_schema(cls):
-#         # Access doesn't do schemas
-#         return
-#
-#     @pytest.mark.skip()
-#     def test_underscore_names(cls):
-#         return
+import sqlalchemy_sybase as sybase
+
+
+class ComponentReflectionTest(_ComponentReflectionTest):
+    @pytest.mark.skip()
+    def test_get_unique_constraints(cls):
+        # "Incorrect syntax near ','."
+        # but the same query works okay from a DBeaver SQL Editor pane
+        return
+
+
+class CompoundSelectTest(_CompoundSelectTest):
+    @pytest.mark.skip()
+    def test_limit_offset_aliased_selectable_in_unions(cls):
+        # "An ORDER BY clause is not allowed in a derived table."
+        return
+
+    @pytest.mark.skip()
+    def test_limit_offset_in_unions_from_alias(cls):
+        # "An ORDER BY clause is not allowed in a derived table."
+        return
+
+    @pytest.mark.skip()
+    def test_limit_offset_selectable_in_unions(cls):
+        # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+
+class DateTest(_DateTest):
+    @pytest.mark.skip()
+    def test_null_bound_comparison(cls):
+        # "The datatype of a parameter marker used in the dynamic
+        #  prepare statement could not be resolved."
+        return
+
+
+class DateTimeCoercedToDateTimeTest(_DateTimeCoercedToDateTimeTest):
+    @pytest.mark.skip()
+    def test_null_bound_comparison(cls):
+        # "The datatype of a parameter marker used in the dynamic
+        #  prepare statement could not be resolved."
+        return
+
+
+class DateTimeMicrosecondsTest(_DateTimeMicrosecondsTest):
+    @pytest.mark.skip()
+    def test_null_bound_comparison(cls):
+        # "The datatype of a parameter marker used in the dynamic
+        #  prepare statement could not be resolved."
+        return
+
+
+class DateTimeTest(_DateTimeTest):
+    @pytest.mark.skip()
+    def test_null_bound_comparison(cls):
+        # "The datatype of a parameter marker used in the dynamic
+        #  prepare statement could not be resolved."
+        return
+
+
+class DeprecatedCompoundSelectTest(_DeprecatedCompoundSelectTest):
+    @pytest.mark.skip()
+    def test_limit_offset_aliased_selectable_in_unions(cls):
+        # "An ORDER BY clause is not allowed in a derived table."
+        return
+
+    @pytest.mark.skip()
+    def test_limit_offset_selectable_in_unions(cls):
+        # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+
+class DistinctOnTest(_DistinctOnTest):
+    @pytest.mark.skip()
+    def test_distinct_on(cls):
+        # "AssertionError: Warnings were not seen: ..."
+        return
+
+
+class ExpandingBoundInTest(_ExpandingBoundInTest):
+    @pytest.mark.skip()
+    def test_empty_set_against_string(cls):
+        # "Implicit conversion from datatype 'VARCHAR' to 'INT' is not allowed."
+        return
+
+    @pytest.mark.skip()
+    def test_empty_set_against_string_negation(cls):
+        # "Implicit conversion from datatype 'VARCHAR' to 'INT' is not allowed."
+        return
+
+
+class InsertBehaviorTest(_InsertBehaviorTest):
+    @pytest.mark.skip()
+    def test_empty_insert(cls):
+        # "Incorrect syntax near ')'."
+        return
+
+    @pytest.mark.skip()
+    def test_limit_offset_selectable_in_unions(cls):
+        # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+
+class LimitOffsetTest(_LimitOffsetTest):
+    @pytest.mark.skip()
+    def test_simple_offset(cls):
+        # "Sybase ASE does not support OFFSET without LIMIT"
+        return
+
+
+class StringTest(_StringTest):
+    @pytest.mark.skip()
+    def test_literal_non_ascii(cls):
+        # TODO: revisit this when we can test against a
+        #       Unicode-enabled database
+        return
+
+
+# =================================================
+# ---------- End of Test Suite overrides ----------
+# =================================================
+
+
+class CompileTestImportedFromInternalDialect(
+    fixtures.TestBase, AssertsCompiledSQL
+):
+    __dialect__ = sybase.dialect()
+
+    def test_extract(self):
+        t = sql.table("t", sql.column("col1"))
+
+        mapping = {
+            "day": "day",
+            "doy": "dayofyear",
+            "dow": "weekday",
+            "milliseconds": "millisecond",
+            "millisecond": "millisecond",
+            "year": "year",
+        }
+
+        for field, subst in list(mapping.items()):
+            self.assert_compile(
+                select([extract(field, t.c.col1)]),
+                'SELECT DATEPART("%s", t.col1) AS anon_1 FROM t' % subst,
+            )
+
+    def test_limit_offset(self):
+        stmt = select([1]).limit(5).offset(6)
+        assert stmt.compile().params == {"param_1": 5, "param_2": 6}
+        self.assert_compile(
+            stmt, "SELECT 1 ROWS OFFSET :param_1 LIMIT :param_2 "
+        )
+
+    def test_offset_not_supported(self):
+        stmt = select([1]).offset(10)
+        assert_raises_message(
+            NotImplementedError,
+            "Sybase ASE does not support OFFSET without LIMIT",
+            stmt.compile,
+            dialect=self.__dialect__,
+        )
+
+    def test_delete_extra_froms(self):
+        t1 = sql.table("t1", sql.column("c1"))
+        t2 = sql.table("t2", sql.column("c1"))
+        q = sql.delete(t1).where(t1.c.c1 == t2.c.c1)
+        self.assert_compile(
+            q, "DELETE FROM t1 FROM t1, t2 WHERE t1.c1 = t2.c1"
+        )
+
+    def test_delete_extra_froms_alias(self):
+        a1 = sql.table("t1", sql.column("c1")).alias("a1")
+        t2 = sql.table("t2", sql.column("c1"))
+        q = sql.delete(a1).where(a1.c.c1 == t2.c.c1)
+        self.assert_compile(
+            q, "DELETE FROM a1 FROM t1 AS a1, t2 WHERE a1.c1 = t2.c1"
+        )
+        self.assert_compile(sql.delete(a1), "DELETE FROM t1 AS a1")
