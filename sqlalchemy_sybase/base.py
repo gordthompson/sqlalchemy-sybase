@@ -471,8 +471,8 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
 
         if self.isddl:
             # TODO: to enhance this, we can detect "ddl in tran" on the
-            # database settings.  this error message should be improved to
-            # include a note about that.
+            #       database settings.  this error message should be improved
+            #       to include a note about that.
             if not self.should_autocommit:
                 raise exc.InvalidRequestError(
                     "The Sybase dialect only supports "
@@ -713,7 +713,7 @@ class SybaseDialect(default.DefaultDialect):
             if isinstance(table_name, unicode):  # noqa
                 table_name = table_name.encode("ascii")
         result = connection.execute(
-            TABLEID_SQL, schema_name=schema, table_name=table_name
+            TABLEID_SQL, {"schema_name": schema, "table_name": table_name}
         )
         table_id = result.scalar()
         if table_id is None:
