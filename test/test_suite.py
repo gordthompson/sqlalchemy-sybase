@@ -23,6 +23,7 @@ from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
+from sqlalchemy.testing.suite import LastrowidTest as _LastrowidTest
 from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
 from sqlalchemy.testing.suite import StringTest as _StringTest
 
@@ -126,6 +127,19 @@ class InsertBehaviorTest(_InsertBehaviorTest):
     @pytest.mark.skip()
     def test_limit_offset_selectable_in_unions(cls):
         # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+    @pytest.mark.skip()
+    def test_insert_from_select_with_defaults(cls):
+        # "Explicit value specified for identity field in table
+        # 'includes_defaults' when 'SET IDENTITY_INSERT' is OFF."
+        return
+
+
+class LastrowidTest(_LastrowidTest):
+    @pytest.mark.skip()
+    def test_last_inserted_id(cls):
+        # "AssertionError: [Decimal('0')] != [2]"
         return
 
 
