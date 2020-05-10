@@ -666,8 +666,9 @@ class SybaseDialect(default.DefaultDialect):
 
     construct_arguments = []
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, isolation_level=None, *args, **kwargs):
         super(SybaseDialect, self).__init__(*args, **kwargs)
+        self.isolation_level = isolation_level
 
     def _get_default_schema_name(self, connection):
         return connection.scalar(
@@ -683,6 +684,16 @@ class SybaseDialect(default.DefaultDialect):
             self.max_identifier_length = 30
         else:
             self.max_identifier_length = 255
+
+    def on_connect(self):
+        if self.isolation_level is not None:
+
+            def connect(conn):
+                self.set_isolation_level(conn, self.isolation_level)
+
+            return connect
+        else:
+            return None
 
     def get_table_id(self, connection, table_name, schema=None, **kw):
         """Fetch the id for schema.table_name.

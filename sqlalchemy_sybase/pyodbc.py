@@ -84,5 +84,14 @@ class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
     def dbapi(cls):
         return PyODBCConnector.dbapi()
 
+    def on_connect(self):
+        super_ = super(SybaseDialect_pyodbc, self).on_connect()
+
+        def on_connect(conn):
+            if super_ is not None:
+                super_(conn)
+
+        return on_connect
+
 
 dialect = SybaseDialect_pyodbc
