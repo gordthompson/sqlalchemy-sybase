@@ -78,6 +78,8 @@ class SybaseExecutionContext_pyodbc(SybaseExecutionContext):
 class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
     execution_ctx_cls = SybaseExecutionContext_pyodbc
 
+    supports_sane_rowcount_returning = True
+
     colspecs = {sqltypes.Numeric: _SybNumeric_pyodbc}
 
     @classmethod

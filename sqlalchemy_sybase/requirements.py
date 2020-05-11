@@ -13,6 +13,10 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
+    def empty_strings_varchar(self):
+        return exclusions.closed()
+
+    @property
     def floats_to_four_decimals(self):
         return exclusions.closed()
 
@@ -22,7 +26,6 @@ class Requirements(SuiteRequirements):
 
     @property
     def nullable_booleans(self):
-        """Target database allows boolean columns to store NULL."""
         return exclusions.closed()
 
     @property
@@ -59,16 +62,10 @@ class Requirements(SuiteRequirements):
 
     @property
     def text_type(self):
-        # TODO: revisit this when we can test against a
-        #       Unicode-enabled database
+        # "Implicit conversion from datatype 'TEXT' to 'VARCHAR'
+        #  is not allowed.  Use the CONVERT function ..."
         return exclusions.closed()
 
     @property
     def time_microseconds(self):
-        return exclusions.closed()
-
-    @property
-    def unicode_data(self):
-        # TODO: revisit this when we can test against a
-        #       Unicode-enabled database
         return exclusions.closed()

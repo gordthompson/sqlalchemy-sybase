@@ -34,7 +34,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
     @pytest.mark.skip()
     def test_get_unique_constraints(cls):
         # "Incorrect syntax near ','."
-        # but the same query works okay from a DBeaver SQL Editor pane
+        # (... but the same query works okay from a DBeaver SQL Editor pane)
         return
 
 
@@ -147,14 +147,6 @@ class LimitOffsetTest(_LimitOffsetTest):
     @pytest.mark.skip()
     def test_simple_offset(cls):
         # "Sybase ASE does not support OFFSET without LIMIT"
-        return
-
-
-class StringTest(_StringTest):
-    @pytest.mark.skip()
-    def test_literal_non_ascii(cls):
-        # TODO: revisit this when we can test against a
-        #       Unicode-enabled database
         return
 
 
