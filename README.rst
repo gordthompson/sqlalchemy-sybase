@@ -4,20 +4,37 @@ sqlalchemy-sybase
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-sybase.svg
         :target: https://pypi.org/project/sqlalchemy-sybase/
 
-A Sybase (SAP ASE) dialect for SQLAlchemy.
+A SAP ASE (Sybase) dialect for SQLAlchemy.
 
 Objectives
 ----------
 
-This dialect will replace SQLAlchemy's internal "sybase" dialect
+This is a fork of SQLAlchemy's internal "sybase" dialect
 which is soon to be deprecated and will be removed from a
 future release.
+
+Status
+------
+
+This dialect currently depends on SQLAlchemy features that have not been
+officially released. For now you must **first** install SQLAlchemy from
+source **before** installing this dialect.
+
+For SQLAlchemy 1.3 ...::
+
+    pip install git+https://github.com/sqlalchemy/sqlalchemy@rel_1_3
+
+... or for (pre-release) SQLAlchemy 1.4 ...::
+
+    pip install git+https://github.com/sqlalchemy/sqlalchemy.git
 
 Pre-requisites
 --------------
 
 You will need an ODBC driver for Sybase installed on the machine from which
-you want to connect to the Sybase server.
+you want to connect to the Sybase server. This dialect is tested with
+a *current version* of the FreeTDS ODBC driver.
+
 
 Co-requisites
 -------------
@@ -25,7 +42,7 @@ Co-requisites
 This dialect requires SQLAlchemy and pyodbc. They are both specified as requirements so ``pip`` will install
 them if they are not already in place. To install, just::
 
-    pip install sqlalchemy-sybase
+    pip install sqlalchemy-sybase --pre
 
 Getting Started
 ---------------

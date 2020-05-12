@@ -24,8 +24,8 @@ setup(
     classifiers=[
         # 'Development Status :: 1 - Planning',
         # "Development Status :: 2 - Pre-Alpha",
-        'Development Status :: 3 - Alpha',
-        # 'Development Status :: 4 - Beta',
+        # 'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         # 'Development Status :: 5 - Production/Stable',
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
@@ -43,7 +43,7 @@ setup(
     },
     packages=find_packages(include=["sqlalchemy_sybase"]),
     include_package_data=True,
-    install_requires=["SQLAlchemy>=1.4.0", "pyodbc"],
+    install_requires=["SQLAlchemy>=1.3.16", "pyodbc"],
     zip_safe=False,
     entry_points={
         "sqlalchemy.dialects": [
