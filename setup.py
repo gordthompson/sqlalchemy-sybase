@@ -15,7 +15,7 @@ readme = os.path.join(os.path.dirname(__file__), "README.rst")
 setup(
     name="sqlalchemy-sybase",
     version=VERSION,
-    description="Sybase for SQLAlchemy",
+    description="SAP ASE (Sybase) for SQLAlchemy",
     long_description=open(readme).read(),
     url="https://github.com/gordthompson/sqlalchemy-sybase",
     author="Gord Thompson",
@@ -35,7 +35,7 @@ setup(
         "Topic :: Database :: Front-Ends",
         "Operating System :: OS Independent",
     ],
-    keywords="SQLAlchemy Microsoft Sybase",
+    keywords="ASE SAP SQLAlchemy Sybase",
     project_urls={
         "Documentation": "https://github.com/gordthompson/sqlalchemy-sybase/wiki",
         "Source": "https://github.com/gordthompson/sqlalchemy-sybase",
@@ -43,7 +43,7 @@ setup(
     },
     packages=find_packages(include=["sqlalchemy_sybase"]),
     include_package_data=True,
-    install_requires=["SQLAlchemy>=1.3.16", "pyodbc"],
+    install_requires=["SQLAlchemy>1.3.16", "pyodbc"],
     zip_safe=False,
     entry_points={
         "sqlalchemy.dialects": [

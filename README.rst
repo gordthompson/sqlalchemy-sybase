@@ -4,7 +4,7 @@ sqlalchemy-sybase
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-sybase.svg
         :target: https://pypi.org/project/sqlalchemy-sybase/
 
-A SAP ASE (Sybase) dialect for SQLAlchemy.
+SAP ASE (Sybase) support for SQLAlchemy.
 
 Objectives
 ----------
@@ -61,7 +61,7 @@ For other ways of connecting see the `Getting Connected`_ page in the Wiki.
 The SQLAlchemy Project
 ======================
 
-SQLAlchemy-sybase is affiliated with the `SQLAlchemy Project <https://www.sqlalchemy.org>`_ and
+sqlalchemy-sybase is affiliated with the `SQLAlchemy Project <https://www.sqlalchemy.org>`_ and
 adheres to the same standards and conventions as the core project.
 
 Development / Bug reporting / Pull requests
@@ -82,5 +82,5 @@ Please see the current Code of Conduct at
 License
 =======
 
-SQLAlchemy-sybase is distributed under the `MIT license
+sqlalchemy-sybase is distributed under the `MIT license
 <https://opensource.org/licenses/MIT>`_.
