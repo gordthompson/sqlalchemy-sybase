@@ -40,6 +40,11 @@ class ComponentReflectionTest(_ComponentReflectionTest):
 
 class CompoundSelectTest(_CompoundSelectTest):
     @pytest.mark.skip()
+    def test_distinct_selectable_in_unions(cls):
+        # "LIMIT clause is not allowed in UNION."
+        return
+
+    @pytest.mark.skip()
     def test_limit_offset_aliased_selectable_in_unions(cls):
         # "An ORDER BY clause is not allowed in a derived table."
         return
@@ -52,6 +57,11 @@ class CompoundSelectTest(_CompoundSelectTest):
     @pytest.mark.skip()
     def test_limit_offset_selectable_in_unions(cls):
         # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+    @pytest.mark.skip()
+    def test_order_by_selectable_in_unions(cls):
+        # "LIMIT clause is not allowed in UNION."
         return
 
 
@@ -89,6 +99,11 @@ class DateTimeTest(_DateTimeTest):
 
 class DeprecatedCompoundSelectTest(_DeprecatedCompoundSelectTest):
     @pytest.mark.skip()
+    def test_distinct_selectable_in_unions(cls):
+        # "LIMIT clause is not allowed in UNION."
+        return
+
+    @pytest.mark.skip()
     def test_limit_offset_aliased_selectable_in_unions(cls):
         # "An ORDER BY clause is not allowed in a derived table."
         return
@@ -96,6 +111,11 @@ class DeprecatedCompoundSelectTest(_DeprecatedCompoundSelectTest):
     @pytest.mark.skip()
     def test_limit_offset_selectable_in_unions(cls):
         # "Incorrect syntax near the keyword 'ORDER'."
+        return
+
+    @pytest.mark.skip()
+    def test_order_by_selectable_in_unions(cls):
+        # "LIMIT clause is not allowed in UNION."
         return
 
 
@@ -182,17 +202,18 @@ class CompileTestImportedFromInternalDialect(
         stmt = select([1]).limit(5).offset(6)
         assert stmt.compile().params == {"param_1": 5, "param_2": 6}
         self.assert_compile(
-            stmt, "SELECT 1 ROWS OFFSET :param_1 LIMIT :param_2 "
+            stmt, "SELECT 1 ROWS LIMIT :param_1 OFFSET :param_2"
         )
 
-    def test_offset_not_supported(self):
+    def test_offset(self):
         stmt = select([1]).offset(10)
-        assert_raises_message(
-            NotImplementedError,
-            "Sybase ASE does not support OFFSET without LIMIT",
-            stmt.compile,
-            dialect=self.__dialect__,
-        )
+        assert stmt.compile().params == {"param_1": 10}
+        self.assert_compile(stmt, "SELECT 1 ROWS OFFSET :param_1")
+
+    def test_limit(self):
+        stmt = select([1]).limit(5)
+        assert stmt.compile().params == {"param_1": 5}
+        self.assert_compile(stmt, "SELECT 1 ROWS LIMIT :param_1")
 
     def test_delete_extra_froms(self):
         t1 = sql.table("t1", sql.column("c1"))
