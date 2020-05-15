@@ -78,6 +78,8 @@ class SybaseExecutionContext_pyodbc(SybaseExecutionContext):
 class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
     execution_ctx_cls = SybaseExecutionContext_pyodbc
 
+    # TODO: remove once https://github.com/sqlalchemy/sqlalchemy/issues/5321
+    #       is resolved and released
     supports_sane_rowcount_returning = True
 
     colspecs = {sqltypes.Numeric: _SybNumeric_pyodbc}

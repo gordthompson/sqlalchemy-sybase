@@ -13,41 +13,34 @@ This is a fork of SQLAlchemy's internal "sybase" dialect
 which is soon to be deprecated and will be removed from a
 future release.
 
-Status
-------
-
-This dialect currently depends on SQLAlchemy features that have not been
-officially released. For now you must **first** install SQLAlchemy from
-source **before** installing this dialect.
-
-For SQLAlchemy 1.3 ...::
-
-    pip install git+https://github.com/sqlalchemy/sqlalchemy@rel_1_3
-
-... or for (pre-release) SQLAlchemy 1.4 ...::
-
-    pip install git+https://github.com/sqlalchemy/sqlalchemy.git
-
 Pre-requisites
 --------------
 
-You will need an ODBC driver for Sybase installed on the machine from which
-you want to connect to the Sybase server. This dialect is tested with
-a *current version* of the FreeTDS ODBC driver.
+You will need an ODBC driver for SAP ASE installed on the machine from which
+you want to connect to the SAP ASE server. This dialect is tested with
+a *current version* of the `FreeTDS`_ ODBC driver.
+
+.. _FreeTDS: https://www.freetds.org/
+
+Also, if you are running on Linux and using `unixODBC`_, check the version via
+``odbcinst -j``. The official repositories of several Linux distributions
+contain versions of unixODBC that are quite old and somewhat buggy.
+
+.. _unixODBC: http://www.unixodbc.org/
 
 
-Co-requisites
--------------
+Installing
+----------
 
-This dialect requires SQLAlchemy and pyodbc. They are both specified as requirements so ``pip`` will install
+SQLAlchemy and pyodbc are specified as requirements so ``pip`` will install
 them if they are not already in place. To install, just::
 
-    pip install sqlalchemy-sybase --pre
+    pip install sqlalchemy-sybase
 
 Getting Started
 ---------------
 
-Create an `ODBC DSN (Data Source Name)`_ that points to your Sybase database.
+Create an `ODBC DSN (Data Source Name)`_ that points to your SAP ASE database.
 Then, in your Python app, you can connect to the database via::
 
     from sqlalchemy import create_engine
