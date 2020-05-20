@@ -1,7 +1,7 @@
 import pytest
 
 from sqlalchemy import extract
-from sqlalchemy.testing import assert_raises_message
+from sqlalchemy.future import select as future_select
 from sqlalchemy.testing.suite import *
 from sqlalchemy.testing.suite import (
     ComponentReflectionTest as _ComponentReflectionTest,
@@ -25,7 +25,6 @@ from sqlalchemy.testing.suite import (
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import LastrowidTest as _LastrowidTest
 from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
-from sqlalchemy.testing.suite import StringTest as _StringTest
 
 import sqlalchemy_sybase as sybase
 
@@ -231,3 +230,26 @@ class CompileTestImportedFromInternalDialect(
             q, "DELETE FROM a1 FROM t1 AS a1, t2 WHERE a1.c1 = t2.c1"
         )
         self.assert_compile(sql.delete(a1), "DELETE FROM t1 AS a1")
+
+
+class TempTableDDLTest(fixtures.TablesTest):
+    __backend__ = True
+
+    @classmethod
+    def define_tables(cls, metadata):
+        pass
+
+    @testing.provide_metadata
+    def test_temp_table(self, connection):
+        table_name = "#tmp"
+        t = Table(
+            table_name,
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("txt", String(50)),
+        )
+        t.create(connection)
+        connection.execute(t.insert({"txt": "temp table test"}))
+        result = connection.scalar(future_select(t.c.id))
+        eq_(result, 1)
+        connection.execute(text(f"DROP TABLE {table_name}"))

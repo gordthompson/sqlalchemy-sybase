@@ -627,7 +627,17 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
 
 
 class SybaseIdentifierPreparer(compiler.IdentifierPreparer):
+    # override LEGAL_CHARACTERS to add `#` for issue #1
+    legal_characters = re.compile(r"^[A-Z0-9_$#]+$", re.I)
     reserved_words = RESERVED_WORDS
+
+    def __init__(self, dialect):
+        super(SybaseIdentifierPreparer, self).__init__(
+            dialect,
+            initial_quote="[",
+            final_quote="]",
+            quote_case_sensitive_collations=False,
+        )
 
 
 class SybaseDialect(default.DefaultDialect):

@@ -49,7 +49,7 @@ Then, in your Python app, you can connect to the database via::
 For other ways of connecting see the `Getting Connected`_ page in the Wiki.
 
 .. _ODBC DSN (Data Source Name): https://support.microsoft.com/en-ca/help/966849/what-is-a-dsn-data-source-name
-.. _Getting Connected: https://github.com/sqlalchemy/sqlalchemy-sybase/wiki/Getting-Connected
+.. _Getting Connected: https://github.com/gordthompson/sqlalchemy-sybase/wiki/Getting-Connected
 
 The SQLAlchemy Project
 ======================

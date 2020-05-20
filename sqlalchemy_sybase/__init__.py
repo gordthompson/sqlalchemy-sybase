@@ -33,7 +33,7 @@ from .base import UNIVARCHAR
 from .base import VARBINARY
 from .base import VARCHAR
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 # default (and only) dialect
 base.dialect = dialect = pyodbc.dialect
