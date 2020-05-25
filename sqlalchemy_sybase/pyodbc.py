@@ -84,6 +84,10 @@ class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
 
     colspecs = {sqltypes.Numeric: _SybNumeric_pyodbc}
 
+    def __init__(self, fast_executemany=False, **params):
+        super(SybaseDialect_pyodbc, self).__init__(**params)
+        self.fast_executemany = fast_executemany
+
     @classmethod
     def dbapi(cls):
         return PyODBCConnector.dbapi()
@@ -96,6 +100,13 @@ class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
                 super_(conn)
 
         return on_connect
+
+    def do_executemany(self, cursor, statement, parameters, context=None):
+        if self.fast_executemany:
+            cursor.fast_executemany = True
+        super(SybaseDialect_pyodbc, self).do_executemany(
+            cursor, statement, parameters, context=context
+        )
 
 
 dialect = SybaseDialect_pyodbc

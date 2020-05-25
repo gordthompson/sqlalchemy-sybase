@@ -4,7 +4,7 @@ sqlalchemy-sybase
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-sybase.svg
         :target: https://pypi.org/project/sqlalchemy-sybase/
 
-SAP ASE (Sybase) support for SQLAlchemy.
+SAP ASE (Sybase) dialect for SQLAlchemy.
 
 Objectives
 ----------
@@ -18,16 +18,15 @@ Pre-requisites
 
 You will need an ODBC driver for SAP ASE installed on the machine from which
 you want to connect to the SAP ASE server. This dialect is tested with
-a *current version* of the `FreeTDS`_ ODBC driver.
-
-.. _FreeTDS: https://www.freetds.org/
+the SAP ASE ODBC driver (``libsybdrvodb-sqllen8.so`` on Linux).
 
 Also, if you are running on Linux and using `unixODBC`_, check the version via
-``odbcinst -j``. The official repositories of several Linux distributions
+``odbcinst -j`` from a console prompt (or use the `odbcinst`_ module).
+The official repositories of several Linux distributions
 contain versions of unixODBC that are quite old and somewhat buggy.
 
 .. _unixODBC: http://www.unixodbc.org/
-
+.. _odbcinst: https://github.com/gordthompson/odbcinst
 
 Installing
 ----------

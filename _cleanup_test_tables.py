@@ -2,7 +2,7 @@ import os
 import pyodbc
 
 cnxn = pyodbc.connect(
-    f"DSN=sybase_test_dsn;UID=sa;PWD={os.environ['sa_PWD']}", autocommit=True
+    f"DSN=test_dsn_sybase;UID=sa;PWD={os.environ['sa_PWD']}", autocommit=True
 )
 crsr = cnxn.cursor()
 
