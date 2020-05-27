@@ -32,8 +32,9 @@ from .base import UNITEXT
 from .base import UNIVARCHAR
 from .base import VARBINARY
 from .base import VARCHAR
+from .pyodbc import get_odbc_info
 
-__version__ = "1.0.2b1"
+__version__ = "1.0.2"
 
 # default (and only) dialect
 base.dialect = dialect = pyodbc.dialect

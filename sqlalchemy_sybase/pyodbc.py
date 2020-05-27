@@ -34,11 +34,29 @@ Currently *not* supported are::
 
 import decimal
 
+import odbcinst
+import pyodbc
+
 from sqlalchemy import processors
 from sqlalchemy import types as sqltypes
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
+from sqlalchemy.exc import DBAPIError
 from .base import SybaseDialect
 from .base import SybaseExecutionContext
+
+
+def get_odbc_info(engine):
+    """retrieve ODBC configuration information for troubleshooting purposes
+    """
+    info = odbcinst.j()
+    try:
+        cnxn = engine.raw_connection()
+        info["SQL_DRIVER_NAME"] = cnxn.getinfo(pyodbc.SQL_DRIVER_NAME)
+        info["SQL_DRIVER_VER"] = cnxn.getinfo(pyodbc.SQL_DRIVER_VER)
+        info["SQL_DBMS_VER"] = cnxn.getinfo(pyodbc.SQL_DBMS_VER)
+    except DBAPIError:
+        pass
+    return info
 
 
 class _SybNumeric_pyodbc(sqltypes.Numeric):
