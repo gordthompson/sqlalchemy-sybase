@@ -436,7 +436,6 @@ class SybaseInspector(reflection.Inspector):
 
 
 class SybaseExecutionContext(default.DefaultExecutionContext):
-    _enable_identity_insert = False
 
     def set_ddl_autocommit(self, connection, value):
         """Must be implemented by subclasses to accommodate DDL executions.
@@ -451,6 +450,10 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
         raise NotImplementedError()
 
     def pre_exec(self):
+        self._enable_identity_insert = False
+        self._select_lastrowid = False
+        self._lastrowid = None
+
         if self.isinsert:
             tbl = self.compiled.statement.table
             seq_column = tbl._autoincrement_column
@@ -462,6 +465,21 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
                 )
             else:
                 self._enable_identity_insert = False
+
+            # _select_lastrowid logic
+            # based on: https://github.com/sqlalchemy/sqlalchemy/
+            # blob/3ab2364e78641c4f0e4b6456afc2cbed39b0d0e6/lib/sqlalchemy/
+            # dialects/mssql/base.py#L1506-L1512
+            self._select_lastrowid = (
+                not self.compiled.inline
+                and insert_has_sequence
+                and not self.compiled.returning
+                and not self._enable_identity_insert
+                and not self.executemany
+            )
+            if self._select_lastrowid:
+                # https://github.com/FreeTDS/freetds/issues/337#issuecomment-640070962
+                self.statement += "\n SELECT @@identity"
 
             if self._enable_identity_insert:
                 self.cursor.execute(
@@ -488,6 +506,11 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
             )
 
     def post_exec(self):
+        if self._select_lastrowid:
+            # fetchall() ensures the cursor is consumed without closing it
+            row = self.cursor.fetchall()[0]
+            self._lastrowid = int(row[0])
+
         if self.isddl:
             self.set_ddl_autocommit(self.root_connection, False)
 
@@ -500,11 +523,7 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
             )
 
     def get_lastrowid(self):
-        cursor = self.create_cursor()
-        cursor.execute("SELECT @@identity AS lastrowid")
-        lastrowid = cursor.fetchone()[0]
-        cursor.close()
-        return lastrowid
+        return self._lastrowid
 
 
 class SybaseSQLCompiler(compiler.SQLCompiler):
