@@ -23,7 +23,6 @@ from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
-from sqlalchemy.testing.suite import LastrowidTest as _LastrowidTest
 from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
 
 import sqlalchemy_sybase as sybase
@@ -152,13 +151,6 @@ class InsertBehaviorTest(_InsertBehaviorTest):
     def test_insert_from_select_with_defaults(cls):
         # "Explicit value specified for identity field in table
         # 'includes_defaults' when 'SET IDENTITY_INSERT' is OFF."
-        return
-
-
-class LastrowidTest(_LastrowidTest):
-    @pytest.mark.skip()
-    def test_last_inserted_id(cls):
-        # "AssertionError: [Decimal('0')] != [2]"
         return
 
 
