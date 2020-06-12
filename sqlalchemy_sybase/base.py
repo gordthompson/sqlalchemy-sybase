@@ -662,7 +662,7 @@ class SybaseIdentifierPreparer(compiler.IdentifierPreparer):
 class SybaseDialect(default.DefaultDialect):
     name = "sybase"
     supports_unicode_statements = False
-    supports_sane_rowcount = True
+    supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
 
     supports_native_boolean = False
