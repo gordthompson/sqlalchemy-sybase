@@ -436,7 +436,6 @@ class SybaseInspector(reflection.Inspector):
 
 
 class SybaseExecutionContext(default.DefaultExecutionContext):
-
     def set_ddl_autocommit(self, connection, value):
         """Must be implemented by subclasses to accommodate DDL executions.
 
@@ -655,6 +654,7 @@ class SybaseIdentifierPreparer(compiler.IdentifierPreparer):
             dialect,
             initial_quote="[",
             final_quote="]",
+            escape_quote="",
             quote_case_sensitive_collations=False,
         )
 
@@ -1049,6 +1049,57 @@ class SybaseDialect(default.DefaultDialect):
             }
         else:
             return {"constrained_columns": [], "name": None}
+
+    @reflection.cache
+    def get_unique_constraints(
+        self, connection, table_name, schema=None, **kw
+    ):
+        table_id = self.get_table_id(
+            connection, table_name, schema, info_cache=kw.get("info_cache")
+        )
+
+        UC_SQL = text(
+            """
+          SELECT object_name(i.id) AS table_name,
+                 i.keycnt AS 'count',
+                 i.name AS name,
+                 index_col(object_name(i.id), i.indid, 1) AS uc_1,
+                 index_col(object_name(i.id), i.indid, 2) AS uc_2,
+                 index_col(object_name(i.id), i.indid, 3) AS uc_3,
+                 index_col(object_name(i.id), i.indid, 4) AS uc_4,
+                 index_col(object_name(i.id), i.indid, 5) AS uc_5,
+                 index_col(object_name(i.id), i.indid, 6) AS uc_6,
+                 index_col(object_name(i.id), i.indid, 7) AS uc_7,
+                 index_col(object_name(i.id), i.indid, 8) AS uc_8,
+                 index_col(object_name(i.id), i.indid, 9) AS uc_9,
+                 index_col(object_name(i.id), i.indid, 10) AS uc_10,
+                 index_col(object_name(i.id), i.indid, 11) AS uc_11,
+                 index_col(object_name(i.id), i.indid, 12) AS uc_12,
+                 index_col(object_name(i.id), i.indid, 13) AS uc_13,
+                 index_col(object_name(i.id), i.indid, 14) AS uc_14,
+                 index_col(object_name(i.id), i.indid, 15) AS uc_15,
+                 index_col(object_name(i.id), i.indid, 16) AS uc_16
+          FROM sysindexes i, sysobjects o
+          WHERE o.id = i.id
+            AND o.id = :table_id
+            AND i.status = 2
+            AND i.indid BETWEEN 1 AND 254
+        """
+        )
+
+        results = connection.execute(UC_SQL, table_id=table_id)
+        uc_rows = results.fetchall()
+        results.close()
+
+        ucs = []
+        for uc_row in uc_rows:
+            column_names = []
+            for i in range(1, uc_row["count"] + 1):
+                column_names.append(uc_row["uc_%i" % (i,)])
+            ucs.append(
+                {"column_names": column_names, "name": uc_row["name"],}
+            )
+        return ucs
 
     @reflection.cache
     def get_schema_names(self, connection, **kw):
