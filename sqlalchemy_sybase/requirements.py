@@ -57,6 +57,10 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
+    def temp_table_reflect_indexes(self):
+        return exclusions.closed()
+
+    @property
     def temporary_views(self):
         return exclusions.closed()
 
