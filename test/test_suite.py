@@ -1,7 +1,7 @@
 import pytest
 
 from sqlalchemy import extract
-from sqlalchemy.future import select as future_select
+from sqlalchemy.testing import AssertsCompiledSQL
 from sqlalchemy.testing.suite import *
 from sqlalchemy.testing.suite import (
     ComponentReflectionTest as _ComponentReflectionTest,
@@ -15,15 +15,28 @@ from sqlalchemy.testing.suite import (
     DateTimeMicrosecondsTest as _DateTimeMicrosecondsTest,
 )
 from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
-from sqlalchemy.testing.suite import (
-    DeprecatedCompoundSelectTest as _DeprecatedCompoundSelectTest,
-)
-from sqlalchemy.testing.suite import DistinctOnTest as _DistinctOnTest
+
+try:
+    from sqlalchemy.testing.suite import (
+        DeprecatedCompoundSelectTest as _DeprecatedCompoundSelectTest,
+    )
+except ImportError:
+    pass
+
+try:
+    from sqlalchemy.testing.suite import DistinctOnTest as _DistinctOnTest
+except ImportError:
+    pass
+
 from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
-from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
+
+try:
+    from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
+except ImportError:
+    pass
 
 import sqlalchemy_sybase as sybase
 
@@ -95,33 +108,44 @@ class DateTimeTest(_DateTimeTest):
         return
 
 
-class DeprecatedCompoundSelectTest(_DeprecatedCompoundSelectTest):
-    @pytest.mark.skip()
-    def test_distinct_selectable_in_unions(cls):
-        # "LIMIT clause is not allowed in UNION."
-        return
+try:
 
-    @pytest.mark.skip()
-    def test_limit_offset_aliased_selectable_in_unions(cls):
-        # "An ORDER BY clause is not allowed in a derived table."
-        return
+    class DeprecatedCompoundSelectTest(_DeprecatedCompoundSelectTest):
+        @pytest.mark.skip()
+        def test_distinct_selectable_in_unions(cls):
+            # "LIMIT clause is not allowed in UNION."
+            return
 
-    @pytest.mark.skip()
-    def test_limit_offset_selectable_in_unions(cls):
-        # "Incorrect syntax near the keyword 'ORDER'."
-        return
+        @pytest.mark.skip()
+        def test_limit_offset_aliased_selectable_in_unions(cls):
+            # "An ORDER BY clause is not allowed in a derived table."
+            return
 
-    @pytest.mark.skip()
-    def test_order_by_selectable_in_unions(cls):
-        # "LIMIT clause is not allowed in UNION."
-        return
+        @pytest.mark.skip()
+        def test_limit_offset_selectable_in_unions(cls):
+            # "Incorrect syntax near the keyword 'ORDER'."
+            return
+
+        @pytest.mark.skip()
+        def test_order_by_selectable_in_unions(cls):
+            # "LIMIT clause is not allowed in UNION."
+            return
 
 
-class DistinctOnTest(_DistinctOnTest):
-    @pytest.mark.skip()
-    def test_distinct_on(cls):
-        # "AssertionError: Warnings were not seen: ..."
-        return
+except NameError:
+    pass
+
+try:
+
+    class DistinctOnTest(_DistinctOnTest):
+        @pytest.mark.skip()
+        def test_distinct_on(cls):
+            # "AssertionError: Warnings were not seen: ..."
+            return
+
+
+except NameError:
+    pass
 
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):
@@ -133,6 +157,11 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
     @pytest.mark.skip()
     def test_empty_set_against_string_negation(cls):
         # "Implicit conversion from datatype 'VARCHAR' to 'INT' is not allowed."
+        return
+
+    @pytest.mark.skip()
+    def test_null_in_empty_set_is_false(cls):
+        # "Incorrect syntax near the keyword 'NULL'."
         return
 
 
@@ -154,12 +183,17 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         return
 
 
-class LimitOffsetTest(_LimitOffsetTest):
-    @pytest.mark.skip()
-    def test_simple_offset(cls):
-        # "Sybase ASE does not support OFFSET without LIMIT"
-        return
+try:
 
+    class LimitOffsetTest(_LimitOffsetTest):
+        @pytest.mark.skip()
+        def test_simple_offset(cls):
+            # "Sybase ASE does not support OFFSET without LIMIT"
+            return
+
+
+except NameError:
+    pass
 
 # =================================================
 # ---------- End of Test Suite overrides ----------
@@ -242,6 +276,6 @@ class TempTableDDLTest(fixtures.TablesTest):
         )
         t.create(connection)
         connection.execute(t.insert({"txt": "temp table test"}))
-        result = connection.scalar(future_select(t.c.id))
+        result = connection.execute(t.select()).scalar()
         eq_(result, 1)
         connection.execute(text(f"DROP TABLE {table_name}"))
