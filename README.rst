@@ -10,7 +10,7 @@ Objectives
 ----------
 
 This is a fork of SQLAlchemy's internal "sybase" dialect
-which is soon to be deprecated and will be removed from a
+which is deprecated in SQLAlchemy 1.4 and will be removed from a
 future release.
 
 Pre-requisites
