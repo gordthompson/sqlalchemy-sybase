@@ -669,6 +669,8 @@ class SybaseDialect(default.DefaultDialect):
     supports_unicode_binds = False
     postfetch_lastrowid = True
 
+    supports_statement_cache = True  # for SQLA 1.4.5+
+
     colspecs = {}
     ischema_names = ischema_names
 
