@@ -665,6 +665,7 @@ class SybaseDialect(default.DefaultDialect):
     supports_unicode_statements = False
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
+    supports_schemas = False
 
     supports_native_boolean = False
     supports_unicode_binds = False
@@ -1185,3 +1186,20 @@ class SybaseDialect(default.DefaultDialect):
             return False
         else:
             return True
+
+
+# If alembic is installed, register an alias in its dialect mapping.
+try:
+    import alembic.ddl.mssql
+except ImportError:
+    pass
+else:
+
+    class SybaseDBImpl(alembic.ddl.mssql.MSSQLImpl):
+        __dialect__ = "sybase"
+        transactional_ddl = True
+
+    # @compiles(alembic.ddl.postgresql.PostgresqlColumnType, "cockroachdb")
+    # def visit_column_type(*args, **kwargs):
+    #     return alembic.ddl.postgresql.visit_column_type(*args, **kwargs)
+

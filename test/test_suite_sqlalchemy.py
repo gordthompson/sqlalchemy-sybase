@@ -31,11 +31,6 @@ from sqlalchemy.testing.suite import (
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 
-try:
-    from sqlalchemy.testing.suite import LimitOffsetTest as _LimitOffsetTest
-except ImportError:
-    pass
-
 import sqlalchemy_sybase as sybase
 
 
@@ -184,15 +179,6 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         # "Explicit value specified for identity field in table
         # 'includes_defaults' when 'SET IDENTITY_INSERT' is OFF."
         return
-
-
-try:
-
-    class LimitOffsetTest(_LimitOffsetTest):
-        @testing.skip("sybase")
-        def test_simple_offset(self):
-            # "Sybase ASE does not support OFFSET without LIMIT"
-            return
 
 
 except NameError:

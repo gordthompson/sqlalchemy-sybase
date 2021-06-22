@@ -1,9 +1,10 @@
-from sqlalchemy.testing.requirements import SuiteRequirements
+from sqlalchemy.testing.requirements import SuiteRequirements as SuiteRequirementsSQLA
+from alembic.testing.requirements import SuiteRequirements as SuiteRequirementsAlembic
 
 from sqlalchemy.testing import exclusions
 
 
-class Requirements(SuiteRequirements):
+class Requirements(SuiteRequirementsSQLA, SuiteRequirementsAlembic):
     @property
     def bound_limit_offset(self):
         return exclusions.closed()
@@ -72,4 +73,14 @@ class Requirements(SuiteRequirements):
 
     @property
     def time_microseconds(self):
+        return exclusions.closed()
+
+    # Alembic test suite requirements
+
+    @property
+    def fk_ondelete_restrict(self):
+        return exclusions.closed()
+
+    @property
+    def fk_onupdate_restrict(self):
         return exclusions.closed()
