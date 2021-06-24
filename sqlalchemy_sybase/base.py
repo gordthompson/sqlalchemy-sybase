@@ -773,7 +773,7 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        results = connection.execute(COLUMN_SQL, table_id=table_id)
+        results = connection.execute(COLUMN_SQL, dict(table_id=table_id))
 
         columns = []
         for (
@@ -872,10 +872,10 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        results = connection.execute(COLUMN_SQL, table_id=table_id)
+        results = connection.execute(COLUMN_SQL, dict(table_id=table_id))
         columns = {}
         for col in results:
-            columns[col["id"]] = col["name"]
+            columns[col._mapping["id"]] = col._mapping["name"]
         column_cache[table_id] = columns
 
         REFCONSTRAINT_SQL = text(
@@ -900,7 +900,7 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
         referential_constraints = connection.execute(
-            REFCONSTRAINT_SQL, table_id=table_id
+            REFCONSTRAINT_SQL, dict(table_id=table_id)
         ).fetchall()
 
         REFTABLE_SQL = text(
@@ -912,24 +912,31 @@ class SybaseDialect(default.DefaultDialect):
         )
 
         for r in referential_constraints:
-            reftable_id = r["reftable_id"]
+            reftable_id = r._mapping["reftable_id"]
 
             if reftable_id not in table_cache:
-                c = connection.execute(REFTABLE_SQL, table_id=reftable_id)
+                c = connection.execute(
+                    REFTABLE_SQL, dict(table_id=reftable_id)
+                )
                 reftable = c.fetchone()
                 c.close()
-                table_info = {"name": reftable["name"], "schema": None}
+                table_info = {
+                    "name": reftable._mapping["name"],
+                    "schema": None,
+                }
                 if (
                     schema is not None
-                    or reftable["schema"] != self.default_schema_name
+                    or reftable._mapping["schema"] != self.default_schema_name
                 ):
                     table_info["schema"] = reftable["schema"]
 
                 table_cache[reftable_id] = table_info
-                results = connection.execute(COLUMN_SQL, table_id=reftable_id)
+                results = connection.execute(
+                    COLUMN_SQL, dict(table_id=reftable_id)
+                )
                 reftable_columns = {}
                 for col in results:
-                    reftable_columns[col["id"]] = col["name"]
+                    reftable_columns[col._mapping["id"]] = col._mapping["name"]
                 column_cache[reftable_id] = reftable_columns
 
             reftable = table_cache[reftable_id]
@@ -937,16 +944,18 @@ class SybaseDialect(default.DefaultDialect):
 
             constrained_columns = []
             referred_columns = []
-            for i in range(1, r["count"] + 1):
-                constrained_columns.append(columns[r["fokey%i" % i]])
-                referred_columns.append(reftable_columns[r["refkey%i" % i]])
+            for i in range(1, r._mapping["count"] + 1):
+                constrained_columns.append(columns[r._mapping["fokey%i" % i]])
+                referred_columns.append(
+                    reftable_columns[r._mapping["refkey%i" % i]]
+                )
 
             fk_info = {
                 "constrained_columns": constrained_columns,
                 "referred_schema": reftable["schema"],
                 "referred_table": reftable["name"],
                 "referred_columns": referred_columns,
-                "name": r["name"],
+                "name": r._mapping["name"],
             }
 
             foreign_keys.append(fk_info)
@@ -989,15 +998,15 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        results = connection.execute(INDEX_SQL, table_id=table_id)
+        results = connection.execute(INDEX_SQL, dict(table_id=table_id))
         indexes = []
         for r in results:
             column_names = []
-            for i in range(1, r["count"]):
-                column_names.append(r["col_%i" % (i,)])
+            for i in range(1, r._mapping["count"]):
+                column_names.append(r._mapping["col_%i" % (i,)])
             index_info = {
-                "name": r["name"],
-                "unique": bool(r["unique"]),
+                "name": r._mapping["name"],
+                "unique": bool(r._mapping["unique"]),
                 "column_names": column_names,
             }
             indexes.append(index_info)
@@ -1039,17 +1048,17 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        results = connection.execute(PK_SQL, table_id=table_id)
+        results = connection.execute(PK_SQL, dict(table_id=table_id))
         pks = results.fetchone()
         results.close()
 
         constrained_columns = []
         if pks:
-            for i in range(1, pks["count"] + 1):
-                constrained_columns.append(pks["pk_%i" % (i,)])
+            for i in range(1, pks._mapping["count"] + 1):
+                constrained_columns.append(pks._mapping["pk_%i" % (i,)])
             return {
                 "constrained_columns": constrained_columns,
-                "name": pks["name"],
+                "name": pks._mapping["name"],
             }
         else:
             return {"constrained_columns": [], "name": None}
@@ -1091,17 +1100,20 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        results = connection.execute(UC_SQL, table_id=table_id)
+        results = connection.execute(UC_SQL, dict(table_id=table_id))
         uc_rows = results.fetchall()
         results.close()
 
         ucs = []
         for uc_row in uc_rows:
             column_names = []
-            for i in range(1, uc_row["count"] + 1):
-                column_names.append(uc_row["uc_%i" % (i,)])
+            for i in range(1, uc_row._mapping["count"] + 1):
+                column_names.append(uc_row._mapping["uc_%i" % (i,)])
             ucs.append(
-                {"column_names": column_names, "name": uc_row["name"],}
+                {
+                    "column_names": column_names,
+                    "name": uc_row._mapping["name"],
+                }
             )
         return ucs
 
@@ -1132,9 +1144,9 @@ class SybaseDialect(default.DefaultDialect):
             if isinstance(schema, unicode):  # noqa
                 schema = schema.encode("ascii")
 
-        tables = connection.execute(TABLE_SQL, schema_name=schema)
+        tables = connection.execute(TABLE_SQL, dict(schema_name=schema))
 
-        return [t["name"] for t in tables]
+        return [t._mapping["name"] for t in tables]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
@@ -1202,4 +1214,3 @@ else:
     # @compiles(alembic.ddl.postgresql.PostgresqlColumnType, "cockroachdb")
     # def visit_column_type(*args, **kwargs):
     #     return alembic.ddl.postgresql.visit_column_type(*args, **kwargs)
-
