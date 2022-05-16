@@ -13,6 +13,12 @@ This is a fork of SQLAlchemy's internal "sybase" dialect
 which is deprecated in SQLAlchemy 1.4 and will be removed from a
 future release.
 
+Database Version Support
+------------------------
+
+This dialect is tested against SAP ASE version 16. Some features may not work
+on earlier versions of SAP ASE.
+
 Pre-requisites
 --------------
 
