@@ -43,7 +43,7 @@ setup(
     },
     packages=find_packages(include=["sqlalchemy_sybase"]),
     include_package_data=True,
-    install_requires=["odbcinst", "pyodbc", "SQLAlchemy>1.3.16"],
+    install_requires=["odbcinst", "pyodbc", "SQLAlchemy>=2.0.0"],
     zip_safe=False,
     entry_points={
         "sqlalchemy.dialects": [

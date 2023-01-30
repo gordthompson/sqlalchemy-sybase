@@ -6,6 +6,10 @@ from sqlalchemy.testing import exclusions
 
 class Requirements(SuiteRequirementsSQLA, SuiteRequirementsAlembic):
     @property
+    def array_type(self):
+        return exclusions.closed()
+
+    @property
     def bound_limit_offset(self):
         return exclusions.closed()
 
@@ -36,6 +40,10 @@ class Requirements(SuiteRequirementsSQLA, SuiteRequirementsAlembic):
     @property
     def reflects_pk_names(self):
         return exclusions.open()
+
+    @property
+    def schemas(self):
+        return exclusions.closed()
 
     @property
     def sql_expression_limit_offset(self):
@@ -84,3 +92,11 @@ class Requirements(SuiteRequirementsSQLA, SuiteRequirementsAlembic):
     @property
     def fk_onupdate_restrict(self):
         return exclusions.closed()
+
+    @property
+    def uuid_data_type(self):
+        return exclusions.closed()
+
+    @property
+    def view_column_reflection(self):
+        return exclusions.open()

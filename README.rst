@@ -6,12 +6,16 @@ sqlalchemy-sybase
 
 SAP ASE (Sybase) dialect for SQLAlchemy.
 
-Objectives
-----------
+The latest version of this dialect requires SQLAlchemy 2.0 or later. To work with earlier versions of SQLAlchemy, do::
+
+    pip install sqlalchemy-sybase<2.0.0
+
+Overview
+--------
 
 This is a fork of SQLAlchemy's internal "sybase" dialect
-which is deprecated in SQLAlchemy 1.4 and will be removed from a
-future release.
+which was deprecated in SQLAlchemy 1.4 and was removed from
+SQLAlchemy 2.0.
 
 Database Version Support
 ------------------------

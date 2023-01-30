@@ -487,21 +487,12 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
                 )
 
         if self.isddl:
-            # TODO: to enhance this, we can detect "ddl in tran" on the
-            #       database settings.  this error message should be improved
-            #       to include a note about that.
-            if not self.should_autocommit:
-                raise exc.InvalidRequestError(
-                    "The Sybase dialect only supports "
-                    "DDL in 'autocommit' mode at this time."
-                )
-
             self.root_connection.engine.logger.info(
                 "AUTOCOMMIT (Assuming no Sybase 'ddl in tran')"
             )
 
             self.set_ddl_autocommit(
-                self.root_connection.connection.connection, True
+                self.root_connection.connection.driver_connection, True
             )
 
     def post_exec(self):
@@ -586,7 +577,7 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
             for t in [from_table] + extra_froms
         )
 
-    def visit_empty_set_expr(self, type_):
+    def visit_empty_set_expr(self, type_, **kw):
         return "SELECT 1 WHERE 1!=1"
 
 
@@ -636,7 +627,7 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
 
         return colspec
 
-    def visit_drop_index(self, drop):
+    def visit_drop_index(self, drop, **kw):
         index = drop.element
         return "\nDROP INDEX %s.%s" % (
             self.preparer.quote_identifier(index.table.name),
@@ -736,11 +727,6 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        if util.py2k:
-            if isinstance(schema, unicode):  # noqa
-                schema = schema.encode("ascii")
-            if isinstance(table_name, unicode):  # noqa
-                table_name = table_name.encode("ascii")
         result = connection.execute(
             TABLEID_SQL, {"schema_name": schema, "table_name": table_name}
         )
@@ -1140,10 +1126,6 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        if util.py2k:
-            if isinstance(schema, unicode):  # noqa
-                schema = schema.encode("ascii")
-
         tables = connection.execute(TABLE_SQL, dict(schema_name=schema))
 
         return [t._mapping["name"] for t in tables]
@@ -1162,12 +1144,7 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        if util.py2k:
-            if isinstance(view_name, unicode):  # noqa
-                view_name = view_name.encode("ascii")
-
         view = connection.execute(VIEW_DEF_SQL, view_name=view_name)
-
         return view.scalar()
 
     @reflection.cache
@@ -1184,14 +1161,10 @@ class SybaseDialect(default.DefaultDialect):
         """
         )
 
-        if util.py2k:
-            if isinstance(schema, unicode):  # noqa
-                schema = schema.encode("ascii")
-        views = connection.execute(VIEW_SQL, schema_name=schema)
+        views = connection.execute(VIEW_SQL, dict(schema_name=schema)).all()
+        return [v.name for v in views if v.name != "sysquerymetrics"]
 
-        return [v["name"] for v in views]
-
-    def has_table(self, connection, table_name, schema=None):
+    def has_table(self, connection, table_name, schema=None, info_cache=None):
         try:
             self.get_table_id(connection, table_name, schema)
         except exc.NoSuchTableError:

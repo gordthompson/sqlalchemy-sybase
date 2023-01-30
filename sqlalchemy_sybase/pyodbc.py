@@ -37,7 +37,6 @@ import decimal
 import odbcinst
 import pyodbc
 
-from sqlalchemy import processors
 from sqlalchemy import types as sqltypes
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy.exc import DBAPIError
@@ -75,7 +74,7 @@ class _SybNumeric_pyodbc(sqltypes.Numeric):
             if self.asdecimal and isinstance(value, decimal.Decimal):
 
                 if value.adjusted() < -6:
-                    return processors.to_float(value)
+                    return float(value)
 
             if super_process:
                 return super_process(value)
@@ -105,8 +104,9 @@ class SybaseDialect_pyodbc(PyODBCConnector, SybaseDialect):
         self.fast_executemany = fast_executemany
 
     @classmethod
-    def dbapi(cls):
-        return PyODBCConnector.dbapi()
+    def import_dbapi(cls):
+        import pyodbc as module
+        return module
 
     def on_connect(self):
         super_ = super(SybaseDialect_pyodbc, self).on_connect()
