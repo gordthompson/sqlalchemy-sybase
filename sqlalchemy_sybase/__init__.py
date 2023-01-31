@@ -34,7 +34,7 @@ from .base import VARBINARY
 from .base import VARCHAR
 from .pyodbc import get_odbc_info
 
-__version__ = "2.0.0"
+__version__ = "2.0.1.dev0"
 
 # default (and only) dialect
 base.dialect = dialect = pyodbc.dialect
