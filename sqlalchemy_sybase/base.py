@@ -914,7 +914,7 @@ class SybaseDialect(default.DefaultDialect):
                     schema is not None
                     or reftable._mapping["schema"] != self.default_schema_name
                 ):
-                    table_info["schema"] = reftable["schema"]
+                    table_info["schema"] = reftable._mapping["schema"]
 
                 table_cache[reftable_id] = table_info
                 results = connection.execute(
